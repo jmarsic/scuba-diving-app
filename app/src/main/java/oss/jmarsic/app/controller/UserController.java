@@ -1,5 +1,6 @@
 package oss.jmarsic.app.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,10 +27,7 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public String addUser(@RequestParam String username, @RequestParam String email, @RequestParam String password) {
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
+    public String addUser(@Valid @ModelAttribute("user") User user) {
         userService.save(user);
         return "redirect:/user";
     }
