@@ -37,32 +37,30 @@ public class DataInitializer implements CommandLineRunner {
             return roleRepository.save(role);
         });
 
-//        User user = new User();
-//        user.setUsername("user");
-//        user.setPassword(passwordEncoder.encode("password"));
-//        Set<Role> userRoles = new HashSet<>();
-//        userRoles.add(userRole);
-//        user.setRoles(userRoles);
-//        userRepository.save(user);
-
-        if(userRepository.findByEmail("ADMIN").isEmpty()) {
+        if(userRepository.findByEmail("admin@gmail.com").isEmpty()) {
             User admin = new User();
-            admin.setEmail("ADMIN");
-            admin.setPassword(passwordEncoder.encode("admin"));
+            admin.setFullName("App Admin");
+            admin.setEmail("admin@gmail.com");
+            admin.setPassword(passwordEncoder.encode("admin1234"));
             Set<Role> adminRoles = new HashSet<>();
             adminRoles.add(adminRole);
             admin.setRoles(adminRoles);
             userRepository.save(admin);
+
+            System.out.println("Admin was created with role: " + adminRole.getName());
         }
 
-        if (userRepository.findByEmail("USER").isEmpty()) {
+        if (userRepository.findByEmail("user@gmail.com").isEmpty()) {
             User user = new User();
-            user.setEmail("USER");
-            user.setPassword(passwordEncoder.encode("user"));
+            user.setFullName("First User");
+            user.setEmail("user@gmail.com");
+            user.setPassword(passwordEncoder.encode("user1234"));
             Set<Role> userRoles = new HashSet<>();
             userRoles.add(userRole);
             user.setRoles(userRoles);
             userRepository.save(user);
+
+            System.out.println("User was created with role: " + userRole.getName());
         }
     }
 }
