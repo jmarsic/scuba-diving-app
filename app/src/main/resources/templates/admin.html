@@ -10,7 +10,7 @@
     <h2>Add new user</h2>
     <form action="/admin/add-user" method="post">
         <label for="fullname">Full Name:</label>
-        <input type="text" id="fullname" name="fullname" required>
+        <input type="text" id="fullname" name="fullName" required>
         <br>
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required>
@@ -30,8 +30,8 @@
     <hr>
 
     <h2>Search for users</h2>
-    <form action="/admin/search-users" method="get">
-        <input type="text" id="search" name="search" placeholder="Search by name...">
+    <form action="/admin/search" method="get">
+        <input type="text" id="search" name="query" placeholder="Search by name...">
         <input type="submit" value="Search">
     </form>
 
@@ -42,8 +42,8 @@
         <th:block th:each="user : ${users}">
             <li>
                 <span th:text="${user.fullName}"></span> - <span th:text="${user.email}"></span>
-<!--                <a th:href="@{/admin/edit-user/{id}(id=${user.id}">Edit</a>-->
-<!--                <a th:href="@{/admin/delete-user/{id}(id=${user.id}">Delete</a>-->
+                <a th:href="@{/admin/edit-user/{id}(id=${user.id})}">Edit</a>
+                <a th:href="@{/admin/delete-user/{id}(id=${user.id})}">Delete</a>
             </li>
         </th:block>
     </ul>

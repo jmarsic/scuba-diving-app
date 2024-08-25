@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>User Home</title>
+    <title>User Page</title>
 </head>
 <body>
-    <h1>User Home Page</h1>
+    <h1>Welcome <span th:text="${user.fullName}"></span></h1>
+    <p>Name: <span th:text="${user.fullName}"></span></p>
+    <p>Email: <span th:text="${user.email}"></span></p>
+    <a th:href="@{/user/edit}">Edit Profile</a>
     <a th:href="@{/logout}">Logout</a>
 </body>
 </html>
