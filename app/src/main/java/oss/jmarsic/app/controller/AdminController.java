@@ -2,6 +2,7 @@ package oss.jmarsic.app.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,9 @@ public class AdminController {
     @Autowired
     private RoleService roleService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @GetMapping
     public String adminPage(Model model) {
         model.addAttribute("users", userService.findAll());
@@ -36,7 +40,7 @@ public class AdminController {
         User user = new User();
         user.setFullName(fullName);
         user.setEmail(email);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(password));
 
         Role userRole = roleService.findByName(role).orElseThrow(() -> new IllegalArgumentException("Invalid role!"));
         Set<Role> roles = new HashSet<>();

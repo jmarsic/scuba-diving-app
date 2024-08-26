@@ -5,9 +5,42 @@
     <title>User Page</title>
 </head>
 <body>
-    <h1>Welcome <span th:text="${user.fullName}"></span></h1>
+    <h1>Welcome <span th:text="${user.fullName}">User</span>!</h1>
+
+    <h2>Your dives</h2>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Location</th>
+            <th>Date</th>
+            <th>Depth (meters)</th>
+            <th>Duration (minutes)</th>
+            <th>Additional info</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="dive : ${dives}">
+            <td th:text="${dive.location}">Location</td>
+            <td th:text="${#dates.format(dive.date, 'yyyy-MM-dd')}">Date</td>
+            <td th:text="${dive.depth}">Depth</td>
+            <td th:text="${dive.duration}">Duration</td>
+            <td th:text="${dive.additionalInfo}">Additional info</td>
+            <td>
+                <a th:href="@{/user/edit-dive/{id}(id=${dive.id})}">Edit</a>
+                <a th:href="@{/user/delete-dive/{id}(id=${dive.id})}"
+                   onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a href="/user/add-dive">Add New Dive</a>
+
     <p>Name: <span th:text="${user.fullName}"></span></p>
     <p>Email: <span th:text="${user.email}"></span></p>
+
     <a th:href="@{/user/edit}">Edit Profile</a>
     <a th:href="@{/logout}">Logout</a>
 </body>

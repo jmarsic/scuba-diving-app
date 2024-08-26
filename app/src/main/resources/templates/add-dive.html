@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Add dive</title>
+</head>
+<body>
+    <h1>Add new dive</h1>
+
+    <form action="#" th:action="@{/user/add-dive}" th:object="${dive}" method="post">
+      <label for="location">Location:</label>
+      <input type="text" id="location" th:field="*{location}" required>
+
+      <br>
+
+      <label for="date">Date:</label>
+      <input type="date" id="date" th:field="*{date}" required>
+
+      <br>
+
+      <label for="depth">Depth (meters):</label>
+      <input type="number" id="depth" th:field="*{depth}" required>
+
+      <br>
+
+      <label for="duration">Duration (minutes):</label>
+      <input type="number" id="duration" th:field="*{duration}" required>
+
+      <br>
+
+      <label for="additionalInfo">Additional Information:</label>
+      <textarea id="additionalInfo" th:field="*{additionalInfo}"></textarea>
+
+      <br>
+
+      <input type="submit" value="Add Dive">
+    </form>
+
+    <a th:href="@{/user}">Back to profile</a>
+</body>
+</html>

@@ -38,15 +38,36 @@
     <hr>
 
     <h2>All users</h2>
-    <ul>
-        <th:block th:each="user : ${users}">
-            <li>
-                <span th:text="${user.fullName}"></span> - <span th:text="${user.email}"></span>
-                <a th:href="@{/admin/edit-user/{id}(id=${user.id})}">Edit</a>
-                <a th:href="@{/admin/delete-user/{id}(id=${user.id})}">Delete</a>
-            </li>
-        </th:block>
-    </ul>
+    <table>
+        <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.fullName}">Full Name</td>
+            <td th:text="${user.email}">Email</td>
+            <td>
+<!--                <a th:href="@{/admin/edit-user/{id}(id=${user.id})}">Edit</a>-->
+<!--                provjerit kako spojit ovi name, inace maknit-->
+                <a th:href="@{/admin/delete-user/{id}(id=${user.id})}"
+                   onclick="return confirm('Are you sure you want to delete ${user.fullName}?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+<!--    <ul>-->
+<!--        <th:block th:each="user : ${users}">-->
+<!--            <li>-->
+<!--                <span th:text="${user.fullName}"></span> - <span th:text="${user.email}"></span>-->
+<!--                <a th:href="@{/admin/edit-user/{id}(id=${user.id})}">Edit</a>-->
+<!--                <a th:href="@{/admin/delete-user/{id}(id=${user.id})}">Delete</a>-->
+<!--            </li>-->
+<!--        </th:block>-->
+<!--    </ul>-->
 
     <a th:href="@{/logout}">Logout</a>
 
