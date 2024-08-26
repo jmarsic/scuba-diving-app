@@ -30,7 +30,7 @@
             <td>
                 <a th:href="@{/user/edit-dive/{id}(id=${dive.id})}">Edit</a>
                 <a th:href="@{/user/delete-dive/{id}(id=${dive.id})}"
-                   onclick="return confirm('Are you sure?')">Delete</a>
+                   onclick="return confirm('Are you sure you want to delete this dive?')">Delete</a>
             </td>
         </tr>
         </tbody>

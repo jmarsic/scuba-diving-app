@@ -52,35 +52,12 @@ public class AdminController {
         return "redirect:/admin";
     }
 
-//    @GetMapping("/edit-user/{id}")
-//    public String editUser(@PathVariable UUID id, Model model) {
-//        User user = userService.findById(id);
-//        model.addAttribute("user", user);
-//        return "edit-user";
-//    }
-
     @GetMapping("/search")
     public String searchUsers(@RequestParam("query") String query, Model model) {
         List<User> users = userService.searchByFullName(query);
         model.addAttribute("users", users);
         return "admin/user-list";
     }
-
-//    @PostMapping("/edit-user/{id}")
-//    public String updateUser(@PathVariable UUID id, @Valid @RequestParam String fullName, @RequestParam String email, @RequestParam String password, @RequestParam String role) {
-//        User user = userService.findById(id);
-//        user.setFullName(fullName);
-//        user.setEmail(email);
-//        user.setPassword(password);
-//
-//        Role userRole = roleService.findByName(role).orElseThrow(() -> new IllegalArgumentException("Invalid role!"));
-//        Set<Role> roles = new HashSet<>();
-//        roles.add(userRole);
-//        user.setRoles(roles);
-//
-//        userService.save(user);
-//        return "redirect:/admin";
-//    }
 
     @GetMapping("/delete-user/{id}")
     public String deleteUser(@PathVariable UUID id, Model model, Principal principal) {
@@ -90,10 +67,9 @@ public class AdminController {
         if (!user.getId().equals(loggedInUser.getId())) {
             userService.deleteById(id);
         } else {
+            System.out.println("You cannot delete an admin account!");
             model.addAttribute("errorMessage", "You cannot delete your own account!");
         }
-        userService.deleteById(id);
-
         return "redirect:/admin";
     }
 }
