@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import oss.jmarsic.app.model.Role;
 import oss.jmarsic.app.model.User;
+import oss.jmarsic.app.service.NotificationService;
 import oss.jmarsic.app.service.RoleService;
 import oss.jmarsic.app.service.UserService;
 
@@ -25,6 +26,9 @@ public class AdminController {
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -52,11 +56,17 @@ public class AdminController {
         return "redirect:/admin";
     }
 
+    @PostMapping("/send-notification")
+    public String sendNotification(@RequestParam String message) {
+        notificationService.sendNotification(message);
+        return "redirect:/admin";
+    }
+
     @GetMapping("/search")
     public String searchUsers(@RequestParam("query") String query, Model model) {
         List<User> users = userService.searchByFullName(query);
         model.addAttribute("users", users);
-        return "admin/user-list";
+        return "user-list";
     }
 
     @GetMapping("/delete-user/{id}")

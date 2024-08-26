@@ -43,8 +43,8 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public List<User> searchByFullName(String fullName) {
-        return userRepository.findByFullNameContainingIgnoreCase(fullName);
+    public List<User> searchByFullName(String query) {
+        return userRepository.findByFullNameContainingIgnoreCase(query);
     }
 
     public void changePassword(User user, String newPassword) {

@@ -5,7 +5,11 @@
     <title>User Page</title>
 </head>
 <body>
-    <h1>Welcome <span th:text="${user.fullName}">User</span>!</h1>
+    <h1>Welcome, <span th:text="${user.fullName}">User</span>!</h1>
+
+    <div th:if="${notification != null}">
+        <p th:text="${notification.message}"></p>
+    </div>
 
     <h2>Your dives</h2>
 

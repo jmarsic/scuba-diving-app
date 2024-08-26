@@ -29,6 +29,16 @@
 
     <hr>
 
+    <h2>Send notification</h2>
+    <form action="/admin/send-notification" method="post">
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" required></textarea>
+        <br>
+        <input type="submit" value="Send notification">
+    </form>
+
+    <hr>
+
     <h2>Search for users</h2>
     <form action="/admin/search" method="get">
         <input type="text" id="search" name="query" placeholder="Search by name...">

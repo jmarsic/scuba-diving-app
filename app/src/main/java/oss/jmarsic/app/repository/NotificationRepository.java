@@ -7,4 +7,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
+    Notification findTopByOrderBySentAtDesc();
 }

@@ -18,4 +18,8 @@ public class NotificationService {
         notification.setSentAt(LocalDateTime.now());
         notificationRepository.save(notification);
     }
+
+    public Notification getLatestNotification() {
+        return notificationRepository.findTopByOrderBySentAtDesc();
+    }
 }

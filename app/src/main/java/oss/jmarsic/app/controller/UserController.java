@@ -8,8 +8,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import oss.jmarsic.app.model.Dive;
+import oss.jmarsic.app.model.Notification;
 import oss.jmarsic.app.model.User;
 import oss.jmarsic.app.service.DiveService;
+import oss.jmarsic.app.service.NotificationService;
 import oss.jmarsic.app.service.UserService;
 
 import java.security.Principal;
@@ -22,16 +24,23 @@ public class UserController {
     private UserService userService;
 
     @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
     private DiveService diveService;
 
     @GetMapping
     public String userPage(Model model, Principal principal) {
         User user = userService.findByEmail(principal.getName());
-
+        model.addAttribute("user", userService.findByEmail(principal.getName()));
         if (!user.isPasswordChanged()) {
             return "redirect:/user/change-password";
         }
 
+        Notification latestNotification = notificationService.getLatestNotification();
+        System.out.println("Latest notification: " + (latestNotification != null ? latestNotification.getMessage() : "No notification found."));
+
+        model.addAttribute("notification", latestNotification);
         model.addAttribute("user", user);
         model.addAttribute("dives", diveService.getDivesBtUserId(user.getId()));
         return "user";
