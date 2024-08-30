@@ -3,8 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>User Page</title>
+    <style>
+        .graphs {
+            width: 360px;
+            height: 180px;
+        }
+    </style>
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <h1>Welcome, <span th:text="${user.fullName}">User</span>!</h1>
 
     <div th:if="${notification != null}">
@@ -42,10 +50,44 @@
 
     <a href="/user/add-dive">Add New Dive</a>
 
+    <h2>Average dive depth:<span th:text="${averageDepth}">0</span> meters</h2>
+
+    <h2>Dive depths chart</h2>
+    <div class="graphs">
+        <canvas id="depthsChart"></canvas>
+    </div>
+
+    <script>
+        const depths = [[${depths}]];
+        const durations = [[${durations}]];
+
+        const ctx = document.getElementById('depthsChart').getContext('2d');
+        const depthsChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: depths.length}, (_, i) => i + 1),
+                datasets: [{
+                    label: 'Dive Depth (meters)',
+                    data: depths,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
     <p>Name: <span th:text="${user.fullName}"></span></p>
     <p>Email: <span th:text="${user.email}"></span></p>
 
     <a th:href="@{/user/edit}">Edit Profile</a>
     <a th:href="@{/logout}">Logout</a>
+
 </body>
 </html>

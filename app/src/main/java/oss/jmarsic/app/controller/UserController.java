@@ -43,6 +43,9 @@ public class UserController {
         model.addAttribute("notification", latestNotification);
         model.addAttribute("user", user);
         model.addAttribute("dives", diveService.getDivesBtUserId(user.getId()));
+        model.addAttribute("averageDepth", diveService.calculateAverageDepth());
+        model.addAttribute("depths", diveService.getAllDepths());
+        model.addAttribute("durations", diveService.getAllDurations());
         return "user";
     }
 
