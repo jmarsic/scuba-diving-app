@@ -63,7 +63,7 @@ public class UserController {
         user.setEmail(email);
 
         if (newPassword != null && !newPassword.isEmpty()) {
-            user.setPassword(newPassword);
+            userService.changePassword(user, newPassword);
         }
 
         userService.save(user);
@@ -80,6 +80,13 @@ public class UserController {
     public String changePassword(@RequestParam String newPassword, Principal principal) {
         User user = userService.findByEmail(principal.getName());
         userService.changePassword(user, newPassword);
+        return "redirect:/user";
+    }
+
+    @PostMapping("/mark-notification-read/{id}")
+    public String markNotificationRead(@PathVariable UUID id, Principal principal) {
+        User user = userService.findByEmail(principal.getName());
+        notificationService.markAsRead(id, user);
         return "redirect:/user";
     }
 

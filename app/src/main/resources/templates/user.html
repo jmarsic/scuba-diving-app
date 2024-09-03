@@ -15,8 +15,11 @@
 
     <h1>Welcome, <span th:text="${user.fullName}">User</span>!</h1>
 
-    <div th:if="${notification != null}">
-        <p th:text="${notification.message}"></p>
+    <div th:each="userNotification : ${user.userNotifications}" th:if="${!userNotification.isRead}">
+        <p th:text="'Notification: ' + ${userNotification.notification.message}"></p>
+        <form th:action="@{/user/mark-notification-read/{id}(id=${userNotification.notification.id})}" method="post">
+            <button type="submit">Mark as read</button>
+        </form>
     </div>
 
     <h2>Your dives</h2>
