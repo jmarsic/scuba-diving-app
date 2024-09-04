@@ -24,7 +24,11 @@
 
     <h2>Your dives</h2>
 
-    <table>
+    <div th:if="${#lists.isEmpty(dives)}">
+        <p>No dives available.</p>
+    </div>
+
+    <table th:unless="${#lists.isEmpty(dives)}">
         <thead>
         <tr>
             <th>Location</th>
@@ -50,6 +54,20 @@
         </tr>
         </tbody>
     </table>
+
+    <div th:unless="${#lists.isEmpty(dives)}">
+        <ul>
+            <li th:if="${currentPage > 0}">
+                <a th:href="@{/user(page=${currentPage - 1})}">Previous</a>
+            </li>
+            <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:href="@{/user(page=${i})}" th:text="${i + 1}"></a>
+            </li>
+            <li th:if="${currentPage < totalPages - 1}">
+                <a th:href="@{/user(page=${currentPage + 1})}">Next</a>
+            </li>
+        </ul>
+    </div>
 
     <a href="/user/add-dive">Add New Dive</a>
 

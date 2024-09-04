@@ -2,7 +2,7 @@ package oss.jmarsic.app.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.Banner;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,6 +15,9 @@ import oss.jmarsic.app.service.NotificationService;
 import oss.jmarsic.app.service.UserService;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -30,19 +33,23 @@ public class UserController {
     private DiveService diveService;
 
     @GetMapping
-    public String userPage(Model model, Principal principal) {
+    public String userPage(Model model, Principal principal, @RequestParam(defaultValue = "0") int page) {
         User user = userService.findByEmail(principal.getName());
         model.addAttribute("user", userService.findByEmail(principal.getName()));
+
         if (!user.isPasswordChanged()) {
             return "redirect:/user/change-password";
         }
 
         Notification latestNotification = notificationService.getLatestNotification();
-        System.out.println("Latest notification: " + (latestNotification != null ? latestNotification.getMessage() : "No notification found."));
+
+        Page<Dive> divePage = diveService.getDivesBtUserId(user.getId(), page, 10);
+        model.addAttribute("dives", divePage.getContent());
+        model.addAttribute("totalPages", divePage.getTotalPages());
+        model.addAttribute("currentPage", page);
 
         model.addAttribute("notification", latestNotification);
         model.addAttribute("user", user);
-        model.addAttribute("dives", diveService.getDivesBtUserId(user.getId()));
         model.addAttribute("averageDepth", diveService.calculateAverageDepth());
         model.addAttribute("depths", diveService.getAllDepths());
         model.addAttribute("durations", diveService.getAllDurations());
@@ -98,11 +105,29 @@ public class UserController {
 
     @PostMapping("/add-dive")
     public String saveDive(@ModelAttribute("dive") @Valid Dive dive, BindingResult result, Principal principal) {
+        User user = userService.findByEmail(principal.getName());
+
+        List<Dive> divesForDate = diveService.findByDateAndUser(dive.getDate(), user);
+        if(divesForDate.size() >= 2) {
+            result.rejectValue("date", "error.dive", "You can only log two dives per day!");
+            System.out.println("You can only log two dives per day!");
+        }
+
+        if(dive.getDuration() > 120) {
+            result.rejectValue("duration", "error.dive", "A dive cannot be longer than 2 hours!");
+            System.out.println("A dive cannot be longer than 2 hours!");
+        }
+
+        if(dive.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(LocalDate.now())) {
+            result.rejectValue("date", "error.dive", "You cannot log dives for future date!");
+            System.out.println("You cannot log dives for future date!");
+        }
+
         if (result.hasErrors()) {
             System.out.println(result.getAllErrors());
             return "add-dive";
         }
-        User user = userService.findByEmail(principal.getName());
+
         dive.setUser(user);
         diveService.saveDive(dive);
         return "redirect:/user";

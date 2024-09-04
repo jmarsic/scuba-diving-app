@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <link rel="stylesheet">
     <style>
         *,
         *::before,
@@ -59,9 +60,24 @@
           height: 100vh;
         }
 
+        .main-container {
+            text-align: center;
+            padding: 20px;
+        }
+
         h1 {
-            font-size: 60px;
+            font-size: 3rem;
             color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .dive-image {
+            width: 100%;
+            max-width: 900px;
+            height: auto;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 10px 20px 8px rgba(0, 100, 200, .3)
         }
 
         .container {
@@ -71,26 +87,31 @@
             align-items: center;
         }
 
+        a {
+            text-decoration: none;
+        }
+
         button {
             margin:auto;
-            margin-top: 60px;
-            text-decoration: none;
-            background-color: #ea202c;
+            background-color: #ff6347;
             border-radius: 10px;
             color: white;
+            font-size: 1.4rem;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 20px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #548687;
         }
     </style>
 </head>
 <body>
-    <div>
+    <div class="main-container">
         <h1>Welcome to Scuba Diving App</h1>
+        <img th:src="@{/img/dive1.jpg}" alt="diver in sea" class="dive-image">
         <a th:href="@{/login}">
             <div class="container">
                 <button>Login</button>

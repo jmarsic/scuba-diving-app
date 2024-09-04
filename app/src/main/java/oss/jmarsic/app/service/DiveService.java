@@ -1,10 +1,17 @@
 package oss.jmarsic.app.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import oss.jmarsic.app.model.Dive;
+import oss.jmarsic.app.model.User;
 import oss.jmarsic.app.repository.DiveRepository;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -18,8 +25,14 @@ public class DiveService {
         diveRepository.save(dive);
     }
 
-    public List<Dive> getDivesBtUserId(UUID userId) {
-        return diveRepository.findByUserId(userId);
+    public Page<Dive> getDivesBtUserId(UUID userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return diveRepository.findByUserId(userId, pageable);
+    }
+
+    public List<Dive> findByDateAndUser(Date date, User user) {
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return diveRepository.findByUserIdAndDate(user.getId(), localDate);
     }
 
     public double calculateAverageDepth() {
