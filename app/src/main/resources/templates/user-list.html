@@ -3,6 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <title>User List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #255271;
+            color: #548687;
+            margin: 20px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            mac-width: 600px;
+            margin: 0 auto;
+        }
+
+        li {
+            background: #F5F5F5;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        li span {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        li a {
+            color: #FF4C4C;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 4px;
+            background-color: #FFCCCC;
+            transition: background-color 0.3s ease;
+        }
+
+        li a:hover {
+            background-color: #FF4C4C;
+            color: #fff;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #548687;
+            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 4px;
+            background-color: #E8F5E9;
+            max-width: 200px;
+            margin: 20px auto;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-link:hover {
+            background-color: #548687;
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
     <h1>User List</h1>
@@ -18,7 +91,7 @@
 
     <br>
 
-    <a th:href="@{/admin}">Back to admin dashboard</a>
+    <a class="back-link" th:href="@{/admin}">Back to admin dashboard</a>
 
 </body>
 </html>

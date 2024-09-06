@@ -4,111 +4,247 @@
     <meta charset="UTF-8">
     <title>User Page</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #255271;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th, table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        button, a {
+            background-color: #ff6347;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .mark-btn:hover {
+            background-color: #4CAF50;
+        }
+
+        .edit {
+            background-color: #4CAF50;
+        }
+
+        .edit:hover {
+            color: #fff;
+            background-color: #95C623;
+        }
+
+        .delete {
+            background-color: #ff6347;
+        }
+
+        .delete:hover {
+            background-color: #548687;
+        }
+
+        a:hover {
+            background-color: #548687;
+        }
+
+        .add-dive {
+            width: 100%;
+        }
+
+        .notification {
+            background-color: rgba(255, 235, 59, 0.5);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 235, 59, 0.3);
+        }
+
+        .pagination ul {
+            display: flex;
+            justify-content: center;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .pagination ul li {
+            margin: 0 5px;
+        }
+
+        .pagination ul li a {
+            padding: 10px 15px;
+            background-color: #f2f2f2;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .pagination ul li a:hover {
+            background-color: #ddd;
+        }
+
         .graphs {
-            width: 360px;
-            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        canvas {
+            width: 80%;
+            max-width: 800px;
+            max-height: 600px;
+        }
+
+        p {
+            color: #555;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="container">
+        <h1>Welcome, <span th:text="${user.fullName}">User</span>!</h1>
 
-    <h1>Welcome, <span th:text="${user.fullName}">User</span>!</h1>
+        <div class="notification" th:each="userNotification : ${user.userNotifications}" th:if="${!userNotification.isRead}">
+            <p th:text="'Notification: ' + ${userNotification.notification.message}"></p>
+            <form th:action="@{/user/mark-notification-read/{id}(id=${userNotification.notification.id})}" method="post">
+                <button class="mark-btn" type="submit">Mark as read</button>
+            </form>
+        </div>
 
-    <div th:each="userNotification : ${user.userNotifications}" th:if="${!userNotification.isRead}">
-        <p th:text="'Notification: ' + ${userNotification.notification.message}"></p>
-        <form th:action="@{/user/mark-notification-read/{id}(id=${userNotification.notification.id})}" method="post">
-            <button type="submit">Mark as read</button>
-        </form>
-    </div>
+        <h2>Your dives</h2>
 
-    <h2>Your dives</h2>
+        <div th:if="${#lists.isEmpty(dives)}">
+            <p>No dives available.</p>
+        </div>
 
-    <div th:if="${#lists.isEmpty(dives)}">
-        <p>No dives available.</p>
-    </div>
+        <table th:unless="${#lists.isEmpty(dives)}">
+            <thead>
+            <tr>
+                <th>Location</th>
+                <th>Date</th>
+                <th>Depth (meters)</th>
+                <th>Duration (minutes)</th>
+                <th>Additional info</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="dive : ${dives}">
+                <td th:text="${dive.location}">Location</td>
+                <td th:text="${#dates.format(dive.date, 'yyyy-MM-dd')}">Date</td>
+                <td th:text="${dive.depth}">Depth</td>
+                <td th:text="${dive.duration}">Duration</td>
+                <td th:text="${dive.additionalInfo}">Additional info</td>
+                <td>
+                    <a class="edit" th:href="@{/user/edit-dive/{id}(id=${dive.id})}">Edit</a>
+                    <a class="delete" th:href="@{/user/delete-dive/{id}(id=${dive.id})}"
+                       onclick="return confirm('Are you sure you want to delete this dive?')">Delete</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-    <table th:unless="${#lists.isEmpty(dives)}">
-        <thead>
-        <tr>
-            <th>Location</th>
-            <th>Date</th>
-            <th>Depth (meters)</th>
-            <th>Duration (minutes)</th>
-            <th>Additional info</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="dive : ${dives}">
-            <td th:text="${dive.location}">Location</td>
-            <td th:text="${#dates.format(dive.date, 'yyyy-MM-dd')}">Date</td>
-            <td th:text="${dive.depth}">Depth</td>
-            <td th:text="${dive.duration}">Duration</td>
-            <td th:text="${dive.additionalInfo}">Additional info</td>
-            <td>
-                <a th:href="@{/user/edit-dive/{id}(id=${dive.id})}">Edit</a>
-                <a th:href="@{/user/delete-dive/{id}(id=${dive.id})}"
-                   onclick="return confirm('Are you sure you want to delete this dive?')">Delete</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+        <div class="pagination" th:unless="${#lists.isEmpty(dives)}">
+            <ul>
+                <li th:if="${currentPage > 0}">
+                    <a th:href="@{/user(page=${currentPage - 1})}">Previous</a>
+                </li>
+                <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a th:href="@{/user(page=${i})}" th:text="${i + 1}"></a>
+                </li>
+                <li th:if="${currentPage < totalPages - 1}">
+                    <a th:href="@{/user(page=${currentPage + 1})}">Next</a>
+                </li>
+            </ul>
+        </div>
 
-    <div th:unless="${#lists.isEmpty(dives)}">
-        <ul>
-            <li th:if="${currentPage > 0}">
-                <a th:href="@{/user(page=${currentPage - 1})}">Previous</a>
-            </li>
-            <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                <a th:href="@{/user(page=${i})}" th:text="${i + 1}"></a>
-            </li>
-            <li th:if="${currentPage < totalPages - 1}">
-                <a th:href="@{/user(page=${currentPage + 1})}">Next</a>
-            </li>
-        </ul>
-    </div>
+        <a class="add-dive" href="/user/add-dive">Add New Dive</a>
 
-    <a href="/user/add-dive">Add New Dive</a>
+        <h2>Average dive depth:<span th:text="${averageDepth}">0</span> meters</h2>
 
-    <h2>Average dive depth:<span th:text="${averageDepth}">0</span> meters</h2>
+        <h2>Dive depths chart</h2>
+        <div class="graphs">
+            <canvas id="depthsChart"></canvas>
+        </div>
 
-    <h2>Dive depths chart</h2>
-    <div class="graphs">
-        <canvas id="depthsChart"></canvas>
-    </div>
+        <script>
+            const depths = [[${depths}]];
+            const durations = [[${durations}]];
 
-    <script>
-        const depths = [[${depths}]];
-        const durations = [[${durations}]];
-
-        const ctx = document.getElementById('depthsChart').getContext('2d');
-        const depthsChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: Array.from({length: depths.length}, (_, i) => i + 1),
-                datasets: [{
-                    label: 'Dive Depth (meters)',
-                    data: depths,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
+            const ctx = document.getElementById('depthsChart').getContext('2d');
+            const depthsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: depths.length}, (_, i) => i + 1),
+                    datasets: [{
+                        label: 'Dive Depth (meters)',
+                        data: depths,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
-        });
-    </script>
+            });
+        </script>
 
-    <p>Name: <span th:text="${user.fullName}"></span></p>
-    <p>Email: <span th:text="${user.email}"></span></p>
+        <p>Name: <span th:text="${user.fullName}"></span></p>
+        <p>Email: <span th:text="${user.email}"></span></p>
 
-    <a th:href="@{/user/edit}">Edit Profile</a>
-    <a th:href="@{/logout}">Logout</a>
+        <a class="edit" th:href="@{/user/edit}">Edit Profile</a>
+        <a th:href="@{/logout}">Logout</a>
 
+    </div>
 </body>
 </html>
