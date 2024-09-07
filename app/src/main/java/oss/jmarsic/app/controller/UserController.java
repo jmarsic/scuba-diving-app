@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user")
@@ -35,24 +36,45 @@ public class UserController {
     @GetMapping
     public String userPage(Model model, Principal principal, @RequestParam(defaultValue = "0") int page) {
         User user = userService.findByEmail(principal.getName());
-        model.addAttribute("user", userService.findByEmail(principal.getName()));
+        model.addAttribute("user", user);
 
         if (!user.isPasswordChanged()) {
             return "redirect:/user/change-password";
         }
 
         Notification latestNotification = notificationService.getLatestNotification();
+        model.addAttribute("notification", latestNotification);
 
         Page<Dive> divePage = diveService.getDivesBtUserId(user.getId(), page, 10);
+        List<Dive> dives = divePage.getContent();
         model.addAttribute("dives", divePage.getContent());
         model.addAttribute("totalPages", divePage.getTotalPages());
         model.addAttribute("currentPage", page);
 
-        model.addAttribute("notification", latestNotification);
-        model.addAttribute("user", user);
-        model.addAttribute("averageDepth", diveService.calculateAverageDepth());
-        model.addAttribute("depths", diveService.getAllDepths());
-        model.addAttribute("durations", diveService.getAllDurations());
+        double averageDepth = dives.stream()
+                        .mapToDouble(Dive::getDepth)
+                        .average()
+                        .orElse(0.0);
+
+        double averageDuration = dives.stream()
+                        .mapToDouble(Dive::getDuration)
+                        .average()
+                        .orElse(0.0);
+
+        model.addAttribute("averageDepth", String.format("%.2f", averageDepth));
+        model.addAttribute("averageDuration", String.format("%.2f", averageDuration));
+
+        List<Integer> depths = dives.stream()
+                .map(Dive::getDepth)
+                .collect(Collectors.toList());
+
+        List<Integer> durations = dives.stream()
+                .map(Dive::getDuration)
+                .collect(Collectors.toList());
+
+        model.addAttribute("depths", depths);
+        model.addAttribute("durations", durations);
+
         return "user";
     }
 

@@ -16,6 +16,10 @@
             color: #333;
         }
 
+        .header {
+            margin-bottom: 40px;
+        }
+
         .container {
             width: 80%;
             margin: 0 auto;
@@ -84,13 +88,37 @@
         }
 
         .add-dive {
-            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 300px;
+            margin: 40px auto;
+            font-size: 1.2rem;
+            padding: 12px 16px;
         }
 
         .notification {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 500px;
             background-color: rgba(255, 235, 59, 0.5);
-            padding: 15px;
-            margin: 20px 0;
+            padding: 30px;
+            margin: 40px auto;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 235, 59, 0.3);
+        }
+
+        .info-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 500px;
+            background-color: rgba(100, 255, 140, 0.5);
+            padding: 30px;
+            margin: 40px auto;
             border-radius: 10px;
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -135,6 +163,17 @@
             max-height: 600px;
         }
 
+        .average {
+            max-width: 400px;
+            margin: 0 auto;
+            font-size: 1.25rem;
+            color: #fff;
+            padding: 30px;
+            margin-bottom: 40px;
+            background-color: #255271;
+            border-radius: 8px;
+        }
+
         p {
             color: #555;
         }
@@ -146,12 +185,11 @@
     </style>
 </head>
 <body>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <div class="container">
-        <h1>Welcome, <span th:text="${user.fullName}">User</span>!</h1>
+        <h1 class="header">Welcome, <span th:text="${user.fullName}">User</span>!</h1>
 
         <div class="notification" th:each="userNotification : ${user.userNotifications}" th:if="${!userNotification.isRead}">
-            <p th:text="'Notification: ' + ${userNotification.notification.message}"></p>
+            <p th:text="${userNotification.notification.message}"></p>
             <form th:action="@{/user/mark-notification-read/{id}(id=${userNotification.notification.id})}" method="post">
                 <button class="mark-btn" type="submit">Mark as read</button>
             </form>
@@ -160,7 +198,7 @@
         <h2>Your dives</h2>
 
         <div th:if="${#lists.isEmpty(dives)}">
-            <p>No dives available.</p>
+            <p class="info-message">No dives available.</p>
         </div>
 
         <table th:unless="${#lists.isEmpty(dives)}">
@@ -206,19 +244,30 @@
 
         <a class="add-dive" href="/user/add-dive">Add New Dive</a>
 
-        <h2>Average dive depth:<span th:text="${averageDepth}">0</span> meters</h2>
-
-        <h2>Dive depths chart</h2>
+        <h2>Dive depths chart:</h2>
         <div class="graphs">
             <canvas id="depthsChart"></canvas>
         </div>
 
-        <script>
-            const depths = [[${depths}]];
-            const durations = [[${durations}]];
+        <h2 class="average">Average dive depth: <span th:text="${averageDepth}">0</span> meters</h2>
 
-            const ctx = document.getElementById('depthsChart').getContext('2d');
-            const depthsChart = new Chart(ctx, {
+        <h2>Dive durations chart:</h2>
+        <div class="graphs">
+            <canvas id="durationsChart"></canvas>
+        </div>
+
+        <h2 class="average">Average dive duration: <span th:text="${averageDuration}">0</span> minutes</h2>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script th:inline="javascript">
+            const depths = /*[[${depths}]]*/ [];
+            const durations = /*[[${durations}]]*/ [];
+
+            const depthsCtx = document.getElementById('depthsChart').getContext('2d');
+
+            const durationsCtx = document.getElementById('durationsChart').getContext('2d');
+
+            const depthsChart = new Chart(depthsCtx, {
                 type: 'line',
                 data: {
                     labels: Array.from({length: depths.length}, (_, i) => i + 1),
@@ -226,7 +275,27 @@
                         label: 'Dive Depth (meters)',
                         data: depths,
                         borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            const durationsChart = new Chart(durationsCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: durations.length}, (_, i) => i + 1),
+                    datasets: [{
+                        label: 'Dive Duration (minutes)',
+                        data: durations,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2
                     }]
                 },
                 options: {
