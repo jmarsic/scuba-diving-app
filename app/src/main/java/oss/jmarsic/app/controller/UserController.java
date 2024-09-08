@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import oss.jmarsic.app.model.Dive;
 import oss.jmarsic.app.model.Notification;
 import oss.jmarsic.app.model.User;
@@ -126,22 +127,25 @@ public class UserController {
     }
 
     @PostMapping("/add-dive")
-    public String saveDive(@ModelAttribute("dive") @Valid Dive dive, BindingResult result, Principal principal) {
+    public String saveDive(@ModelAttribute("dive") @Valid Dive dive, BindingResult result, Principal principal, RedirectAttributes redirectAttributes) {
         User user = userService.findByEmail(principal.getName());
 
         List<Dive> divesForDate = diveService.findByDateAndUser(dive.getDate(), user);
         if(divesForDate.size() >= 2) {
             result.rejectValue("date", "error.dive", "You can only log two dives per day!");
+//            redirectAttributes.addFlashAttribute("jsMessage", "You can only log two dives per day!");
             System.out.println("You can only log two dives per day!");
         }
 
         if(dive.getDuration() > 120) {
             result.rejectValue("duration", "error.dive", "A dive cannot be longer than 2 hours!");
+//            redirectAttributes.addFlashAttribute("jsMessage", "A dive cannot be longer than 2 hours!");
             System.out.println("A dive cannot be longer than 2 hours!");
         }
 
         if(dive.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(LocalDate.now())) {
             result.rejectValue("date", "error.dive", "You cannot log dives for future date!");
+//            redirectAttributes.addFlashAttribute("jsMessage", "You cannot log dives for future date!");
             System.out.println("You cannot log dives for future date!");
         }
 
@@ -163,18 +167,54 @@ public class UserController {
     }
 
     @PostMapping("/edit-dive/{id}")
-    public String updateDive(@PathVariable UUID id, @ModelAttribute Dive dive, Principal principal) {
+    public String updateDive(@PathVariable UUID id, @ModelAttribute("dive") @Valid Dive dive, BindingResult result, Principal principal, RedirectAttributes redirectAttributes) {
         User user = userService.findByEmail(principal.getName());
         Dive existingDive = diveService.findById(id);
 
-        if (existingDive != null && existingDive.getUser().getId().equals(user.getId())) {
-            existingDive.setLocation(dive.getLocation());
-            existingDive.setDate(dive.getDate());
-            existingDive.setDepth(dive.getDepth());
-            existingDive.setDuration(dive.getDuration());
-            existingDive.setAdditionalInfo(dive.getAdditionalInfo());
-            diveService.saveDive(existingDive);
+        if (existingDive == null || !existingDive.getUser().getId().equals(user.getId())) {
+//            redirectAttributes.addFlashAttribute("jsMessage", "Error: You are not authorized to edit this dive.");
+            return "redirect:/user";
         }
+
+        List<Dive> divesForDate = diveService.findByDateAndUser(dive.getDate(), user);
+        if (divesForDate.size() >= 2 && !divesForDate.contains(existingDive)) {
+            result.rejectValue("date", "error.dive", "You can only log two dives per day!");
+//            redirectAttributes.addFlashAttribute("jsMessage", "You can only log two dives per day!");
+            return "redirect:/edit-dive/";
+        }
+
+        if (dive.getDuration() > 120) {
+            result.rejectValue("duration", "error.dive", "A dive cannot be longer than 2 hours!");
+//            redirectAttributes.addFlashAttribute("jsMessage", "A dive cannot be longer than 2 hours!");
+            return "redirect:/edit-dive/";
+        }
+
+        if (dive.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(LocalDate.now())) {
+            result.rejectValue("date", "error.dive", "You cannot log dives for future dates!");
+//            redirectAttributes.addFlashAttribute("jsMessage", "You cannot log dives for future dates!");
+            return "redirect:/edit-dive/" + id;
+        }
+
+        if (result.hasErrors()) {
+            return "edit-dive";
+        }
+
+//        if (existingDive != null && existingDive.getUser().getId().equals(user.getId())) {
+//            existingDive.setLocation(dive.getLocation());
+//            existingDive.setDate(dive.getDate());
+//            existingDive.setDepth(dive.getDepth());
+//            existingDive.setDuration(dive.getDuration());
+//            existingDive.setAdditionalInfo(dive.getAdditionalInfo());
+//            diveService.saveDive(existingDive);
+//        }
+
+        existingDive.setLocation(dive.getLocation());
+        existingDive.setDate(dive.getDate());
+        existingDive.setDepth(dive.getDepth());
+        existingDive.setDuration(dive.getDuration());
+        existingDive.setAdditionalInfo(dive.getAdditionalInfo());
+        diveService.saveDive(existingDive);
+
         return "redirect:/user";
     }
 

@@ -3,6 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <title>Add dive</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #255271;
+            margin: 0;
+        }
+
+        h1 {
+            color: #fff;
+            margin-top: 32px;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 50px 30px -20px rgba(0, 100, 200, .3)
+            width: 100%;
+            min-width: 400px;
+            max-width:600px;
+        }
+
+        label {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            background-color: #ff6347;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #548687;
+        }
+
+        input[type="submit"]:focus {
+            background-color: #548687;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        a {
+            text-decoration: none;
+            color: #fff;
+            margin-top: 14px;
+            display: inline-block;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            margin-bottom: 14px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
     <h1>Add new dive</h1>
@@ -19,12 +106,12 @@
       <br>
 
       <label for="depth">Depth (meters):</label>
-      <input type="number" id="depth" th:field="*{depth}" required>
+      <input type="number" id="depth" th:field="*{depth}" min="1" max="50" required>
 
       <br>
 
       <label for="duration">Duration (minutes):</label>
-      <input type="number" id="duration" th:field="*{duration}" required>
+      <input type="number" id="duration" th:field="*{duration}" min="1" max="120" required>
 
       <br>
 
