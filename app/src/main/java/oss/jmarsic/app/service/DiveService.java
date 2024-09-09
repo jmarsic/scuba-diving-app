@@ -25,9 +25,9 @@ public class DiveService {
         diveRepository.save(dive);
     }
 
-    public Page<Dive> getDivesBtUserId(UUID userId, int page, int size) {
+    public Page<Dive> getDivesBtUserIdSortedByDate(UUID userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return diveRepository.findByUserId(userId, pageable);
+        return diveRepository.findByUserIdOrderByDateAsc(userId, pageable);
     }
 
     public List<Dive> findByDateAndUser(Date date, User user) {

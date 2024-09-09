@@ -7,7 +7,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import oss.jmarsic.app.model.Dive;
 import oss.jmarsic.app.model.Notification;
 import oss.jmarsic.app.model.User;
@@ -46,7 +45,7 @@ public class UserController {
         Notification latestNotification = notificationService.getLatestNotification();
         model.addAttribute("notification", latestNotification);
 
-        Page<Dive> divePage = diveService.getDivesBtUserId(user.getId(), page, 10);
+        Page<Dive> divePage = diveService.getDivesBtUserIdSortedByDate(user.getId(), page, 10);
         List<Dive> dives = divePage.getContent();
         model.addAttribute("dives", divePage.getContent());
         model.addAttribute("totalPages", divePage.getTotalPages());
@@ -127,26 +126,29 @@ public class UserController {
     }
 
     @PostMapping("/add-dive")
-    public String saveDive(@ModelAttribute("dive") @Valid Dive dive, BindingResult result, Principal principal, RedirectAttributes redirectAttributes) {
+    public String saveDive(@ModelAttribute("dive") @Valid Dive dive, BindingResult result, Principal principal, Model model) {
         User user = userService.findByEmail(principal.getName());
 
         List<Dive> divesForDate = diveService.findByDateAndUser(dive.getDate(), user);
         if(divesForDate.size() >= 2) {
             result.rejectValue("date", "error.dive", "You can only log two dives per day!");
-//            redirectAttributes.addFlashAttribute("jsMessage", "You can only log two dives per day!");
             System.out.println("You can only log two dives per day!");
+            model.addAttribute("error", "You can only log two dives per day!");
+            return "add-dive";
         }
 
         if(dive.getDuration() > 120) {
             result.rejectValue("duration", "error.dive", "A dive cannot be longer than 2 hours!");
-//            redirectAttributes.addFlashAttribute("jsMessage", "A dive cannot be longer than 2 hours!");
             System.out.println("A dive cannot be longer than 2 hours!");
+            model.addAttribute("error", "A dive cannot be longer than 2 hours!");
+            return "add-dive";
         }
 
         if(dive.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(LocalDate.now())) {
             result.rejectValue("date", "error.dive", "You cannot log dives for future date!");
-//            redirectAttributes.addFlashAttribute("jsMessage", "You cannot log dives for future date!");
             System.out.println("You cannot log dives for future date!");
+            model.addAttribute("error", "You cannot log dives for future dates!");
+            return "add-dive";
         }
 
         if (result.hasErrors()) {
@@ -167,7 +169,7 @@ public class UserController {
     }
 
     @PostMapping("/edit-dive/{id}")
-    public String updateDive(@PathVariable UUID id, @ModelAttribute("dive") @Valid Dive dive, BindingResult result, Principal principal, RedirectAttributes redirectAttributes) {
+    public String updateDive(@PathVariable UUID id, @ModelAttribute("dive") @Valid Dive dive, BindingResult result, Principal principal, Model model) {
         User user = userService.findByEmail(principal.getName());
         Dive existingDive = diveService.findById(id);
 
@@ -179,20 +181,20 @@ public class UserController {
         List<Dive> divesForDate = diveService.findByDateAndUser(dive.getDate(), user);
         if (divesForDate.size() >= 2 && !divesForDate.contains(existingDive)) {
             result.rejectValue("date", "error.dive", "You can only log two dives per day!");
-//            redirectAttributes.addFlashAttribute("jsMessage", "You can only log two dives per day!");
-            return "redirect:/edit-dive/";
+            model.addAttribute("error", "You can only log two dives per day!");
+            return "edit-dive";
         }
 
         if (dive.getDuration() > 120) {
             result.rejectValue("duration", "error.dive", "A dive cannot be longer than 2 hours!");
-//            redirectAttributes.addFlashAttribute("jsMessage", "A dive cannot be longer than 2 hours!");
-            return "redirect:/edit-dive/";
+            model.addAttribute("error", "A dive cannot be longer than 2 hours!");
+            return "edit-dive";
         }
 
         if (dive.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(LocalDate.now())) {
             result.rejectValue("date", "error.dive", "You cannot log dives for future dates!");
-//            redirectAttributes.addFlashAttribute("jsMessage", "You cannot log dives for future dates!");
-            return "redirect:/edit-dive/" + id;
+            model.addAttribute("error", "You cannot log dives for future dates!");
+            return "edit-dive";
         }
 
         if (result.hasErrors()) {

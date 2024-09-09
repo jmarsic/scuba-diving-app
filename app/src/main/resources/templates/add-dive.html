@@ -19,6 +19,20 @@
             margin-bottom: 20px;
         }
 
+        .message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 500px;
+            background-color: rgba(243, 211, 74, 0.5);
+            padding: 30px;
+            margin: 40px auto;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 235, 59, 0.3);
+        }
+
         form {
             background-color: white;
             padding: 20px;
@@ -93,6 +107,10 @@
 </head>
 <body>
     <h1>Add new dive</h1>
+
+    <div th:if="${error}" class="message">
+        <p th:text="${error}"></p>
+    </div>
 
     <form action="#" th:action="@{/user/add-dive}" th:object="${dive}" method="post">
       <label for="location">Location:</label>

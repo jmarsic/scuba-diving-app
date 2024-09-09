@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface DiveRepository extends JpaRepository<Dive, UUID> {
-    Page<Dive> findByUserId(UUID userId, Pageable pageable);
+    Page<Dive> findByUserIdOrderByDateAsc(UUID userId, Pageable pageable);
 
     List<Dive> findByUserIdAndDate(UUID userId, LocalDate date);
 }
